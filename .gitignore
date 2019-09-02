@@ -198,3 +198,4 @@ fabric.properties
 # My configurations:
 .idea/
 config.ini
+sg_script_info.py
