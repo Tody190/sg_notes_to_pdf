@@ -24,7 +24,7 @@ def generate_config(config_dict):
         config.write(configfile)
 
 
-def read(section=None, value=None):
+def read(section=None, value=None) -> dict:
     if not os.path.exists(config_path):
         generate_config(config_dict)
 
@@ -63,12 +63,3 @@ def write(section, value):
         config_dict[section] = value_map
 
     generate_config(config_dict)
-
-
-
-
-if __name__ == "__main__":
-    value = {"URL": "https://dezerlin.shotgunstudio.com",
-             "SCRIPT_NAME": "sg_notes_to_HTML",
-             "API_KEY": "wxbxjmmh?pEhumhyosynir6ve"}
-    write("SG", value)

@@ -10,8 +10,11 @@ dezerlin_show += "|  |  |  ||   __|     /  /    |   __|  |      /     |  |     |
 dezerlin_show += "|  '--'  ||  |____   /  /----.|  |____ |  |\  \----.|  `----.|  | |  |\   | \n"
 dezerlin_show += "|_______/ |_______| /________||_______|| _| `._____||_______||__| |__| \__|"
 
-def show(author, version):
+def show(author=None, version=None):
     print(dezerlin_show)
-    print("author: %s   version: %s"%(author, version))
+    if author:
+        print("author: %s"%author)
+    if version:
+        print("version: %s"%version)
     print("enjoy it!")
     print('')
