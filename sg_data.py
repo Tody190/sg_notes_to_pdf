@@ -6,16 +6,18 @@ import collections
 
 import shotgun_api3
 
-import config_tool
+try:
+    import sg_script
+except:
+    raise Exception("需要一个叫 sg_script.py 配置文件, 文件内包含 URL，SCRIPT_NAME，API_KEY 三个全局变量")
 
 
 
 
 class Playlist_Notes:
-    sg_info = config_tool.read("SG")
-    sg = shotgun_api3.Shotgun(sg_info["url"],
-                              script_name=sg_info["script_name"],
-                              api_key=sg_info["api_key"])
+    sg = shotgun_api3.Shotgun(sg_script.URL,
+                              script_name=sg_script.SCRIPT_NAME,
+                              api_key=sg_script.API_KEY)
 
     def __init__(self, playlist_name: str):
         self.playlist_name = playlist_name
