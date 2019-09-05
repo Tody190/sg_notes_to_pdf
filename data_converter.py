@@ -50,8 +50,9 @@ class Html_Notes:
         body += "</p>\n"
         # attachments
         for attachment in attachments:
-            body += "<a href=\"%s\" target=\"_blank\">\n" % attachment
-            body += "<img src=\"%s\" width=\"480\" height=\"270\"/>\n" % attachment
+            #body += "<a href=\"%s\" target=\"_blank\">\n" % attachment
+            #body += "<img src=\"%s\" width=\"480\" height=\"270\"/>\n" % attachment
+            body += "<img src=\"%s\" />\n" % attachment
             body += "</a>\n"
         body += "<br />\n"
         body += "<br />\n"
@@ -100,11 +101,19 @@ def notes_to_html(notes_data, output_path, file_name):
 
 
 def htm_to_pdf(html_file, pdf_file):
-    wkhtmltopdf_path = os.path.dirname(__file__).replace('\\', '/') + '/wkhtmltox/bin/wkhtmltopdf.exe'
-    if not os.path.exists(wkhtmltopdf_path):
-        raise ("%s 不存在"%wkhtmltopdf_path)
-    p = subprocess.Popen([wkhtmltopdf_path, html_file, pdf_file])
+    wkhtmltopdf = os.path.dirname(__file__).replace('\\', '/') + '/wkhtmltox/bin/wkhtmltopdf.exe'
+    if not os.path.exists(wkhtmltopdf):
+        wkhtmltopdf = "wkhtmltopdf"
+    p = subprocess.Popen([wkhtmltopdf, html_file, pdf_file])
     p.communicate()
+    if os.path.exists(pdf_file):
+        return pdf_file
+
+def yt_remove(file):
+    if os.path.isfile(file):
+        os.system("del /f \"%s\""%file)
+    if os.path.isdir(file):
+        os.system("rmdir /q /s \"%s\"" % file)
 
 
 
