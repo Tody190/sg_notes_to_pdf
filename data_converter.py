@@ -5,7 +5,6 @@ __author__ = "yangtao"
 import codecs
 import os
 import subprocess
-import json
 
 
 
