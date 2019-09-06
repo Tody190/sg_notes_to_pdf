@@ -40,12 +40,15 @@ class Playlist_Notes:
         # 获取对应 notes
         notes = collections.OrderedDict()
         for v in version_entitys:
-            notes[v["name"]] = collections.OrderedDict()
+            notes[v["name"]] = []
             note_entitys = self.get_version_notes(v)
+            print("Get: %s"%v["name"])
             for n in note_entitys:
-                notes[v["name"]]["subject"] = n["subject"]
-                notes[v["name"]]["content"] = n["content"]
-                notes[v["name"]]["attachments"] = n["attachments"]
+                note = collections.OrderedDict()
+                note["subject"] = n["subject"]
+                note["content"] = n["content"]
+                note["attachments"] = n["attachments"]
+                notes[v["name"]].append(note)
         return notes
 
     def get_playlist_versions(self, playlist_name) -> list:
@@ -83,21 +86,21 @@ def get_notes_data(playlist, attachments_download_path=None):
     pn = Playlist_Notes(playlist)
     notes_data = pn.get()
 
-    for v in notes_data.values():
-        attachments = v["attachments"]
-        new_attachments = []
-        # 下载附件并将保存地址替换原值
-        for attachment in attachments:
-            if attachments_download_path:
-                attachment_url = download_attachment(attachment, attachments_download_path)
-            else:
-                attachment_url = SG.get_attachment_download_url(attachment)
+    for notes_list in notes_data.values():
+        for note in notes_list:
+            attachments = note["attachments"]
+            new_attachments = []
+            # 下载附件并将保存地址替换原值
+            for attachment in attachments:
+                if attachments_download_path:
+                    attachment_url = download_attachment(attachment, attachments_download_path)
+                else:
+                    attachment_url = SG.get_attachment_download_url(attachment)
 
-            if attachment_url:
-                new_attachments.append(attachment_url)
+                if attachment_url:
+                    new_attachments.append(attachment_url)
 
-        v["attachments"] = new_attachments
-
+            note["attachments"] = new_attachments
     return notes_data
 
 

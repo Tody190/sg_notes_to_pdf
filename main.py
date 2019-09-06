@@ -4,6 +4,8 @@ __version__ = "1.0"
 
 
 import os
+import shutil
+import platform
 
 import dezerlin_welcome
 import sg_data
@@ -35,13 +37,22 @@ def run(playlist, output_path):
             pdf_file = data_converter.htm_to_pdf(html_file,
                                                  os.path.join(output_path, "%s.pdf" % file_name))
             print("Conversion Completed: %s"%pdf_file)
-            # 删除 其它文件
-            data_converter.yt_remove(attachments)
-            data_converter.yt_remove(html_file)
+
+            # 删除临时文件
+            if os.path.exists(attachments):
+                shutil.rmtree(attachments)
+            os.remove(html_file)
+
     print("--- DONE ---")
 
 # UI
 main_ui = ui.Main_Window()
 main_ui.window_name = 'DeZerlin SG Notes to pdf %s by %s'%(__version__, __author__)
-main_ui.window_icon = os.path.dirname(__file__).replace('\\', '/') + '/sg_notes_to_pdf.ico'
+root_file = os.path.dirname(__file__).replace('\\', '/')
+files = os.listdir(root_file)
+if "Darwin" in platform.system():
+    icon_file = root_file + "/sg_notes_to_pdf.icns"
+else:
+    icon_file = root_file + "/sg_notes_to_pdf.ico"
+main_ui.window_icon = icon_file
 main_ui.run_fun = run

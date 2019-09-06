@@ -5,6 +5,7 @@ __author__ = "yangtao"
 import codecs
 import os
 import subprocess
+import platform
 
 
 
@@ -33,39 +34,48 @@ class Html_Notes:
         style += "</style>\n"
         return style
 
-    def __body(self, version, subject, content, attachments):
+    def __note(self, subject, content, attachments):
+        # subject
+        note = ""
+        note += "<h2>\n"
+        note += "%s\n"%subject
+        note += "</h2>\n"
+        # content
+        note += "<p>\n"
+        note += "%s\n"%content
+        note += "</p>\n"
+        # attachments
+        for attachment in attachments:
+            #body += "<a href=\"%s\" target=\"_blank\">\n" % attachment
+            #body += "<img src=\"%s\" width=\"480\" height=\"270\"/>\n" % attachment
+            note += "<img src=\"%s\" />\n" % attachment
+            note += "</a>\n"
+        note += "<br />\n"
+        note += "<br />\n"
+        return note
+
+    def __body(self, version, notes):
         body = "\n"
         # version
         body += "<h1>\n"
         body += "%s\n"%version
         body += "</h1>\n"
-        # subject
-        body += "<h2>\n"
-        body += "%s\n"%subject
-        body += "</h2>\n"
-        # content
-        body += "<p>\n"
-        body += "%s\n"%content
-        body += "</p>\n"
-        # attachments
-        for attachment in attachments:
-            #body += "<a href=\"%s\" target=\"_blank\">\n" % attachment
-            #body += "<img src=\"%s\" width=\"480\" height=\"270\"/>\n" % attachment
-            body += "<img src=\"%s\" />\n" % attachment
-            body += "</a>\n"
-        body += "<br />\n"
-        body += "<br />\n"
-
+        if notes:
+            for n in notes:
+                body += self.__note(subject=n["subject"],
+                                    content=n["content"],
+                                    attachments=n["attachments"])
+        else:
+            body += "<h2>\n"
+            body += "No notes"
+            body += "</h2>\n"
         return body
 
     def build(self, notes_data):
         # add body
         body = ""
         for version_name in notes_data:
-            subject = notes_data[version_name]["subject"]
-            content = notes_data[version_name]["content"]
-            attachments = notes_data[version_name]["attachments"]
-            body += self.__body(version_name, subject, content, attachments)
+            body += self.__body(version_name, notes_data[version_name])
 
         return self.__html(body)
 
@@ -100,19 +110,14 @@ def notes_to_html(notes_data, output_path, file_name):
 
 
 def htm_to_pdf(html_file, pdf_file):
-    wkhtmltopdf = os.path.dirname(__file__).replace('\\', '/') + '/wkhtmltox/bin/wkhtmltopdf.exe'
-    if not os.path.exists(wkhtmltopdf):
+    if "Windows" in platform.system():
+        wkhtmltopdf = os.path.dirname(__file__).replace('\\', '/') + '/wkhtmltox/bin/wkhtmltopdf.exe'
+    else:
         wkhtmltopdf = "wkhtmltopdf"
     p = subprocess.Popen([wkhtmltopdf, html_file, pdf_file])
     p.communicate()
     if os.path.exists(pdf_file):
         return pdf_file
-
-def yt_remove(file):
-    if os.path.isfile(file):
-        os.system("del /f \"%s\""%file)
-    if os.path.isdir(file):
-        os.system("rmdir /q /s \"%s\"" % file)
 
 
 
