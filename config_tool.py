@@ -3,15 +3,19 @@ __author__ = "yangtao"
 
 
 import os
+import sys
 import configparser
 
 
 
 
-config_path = os.path.dirname(__file__).replace('\\', '/') + '/config.ini'
+config_path = os.path.dirname(os.path.realpath(sys.argv[0])).replace('\\', '/') \
+              + '/config.ini'
+#config_path = os.path.dirname(__file__).replace('\\', '/') + '/config.ini'
 config_dict = {"SG": {"url":"",
                       "script_name":"",
-                      "api_key":""}}
+                      "api_key":""},
+               "UI": {"path":""}}
 
 config = configparser.ConfigParser()
 

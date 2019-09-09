@@ -4,6 +4,7 @@ __author__ = "yangtao"
 
 import codecs
 import os
+import sys
 import subprocess
 import platform
 
@@ -111,7 +112,9 @@ def notes_to_html(notes_data, output_path, file_name):
 
 def htm_to_pdf(html_file, pdf_file):
     if "Windows" in platform.system():
-        wkhtmltopdf = os.path.dirname(__file__).replace('\\', '/') + '/wkhtmltox/bin/wkhtmltopdf.exe'
+        wkhtmltopdf = os.path.dirname(os.path.realpath(sys.argv[0])).replace('\\', '/') \
+                      + '/wkhtmltox/bin/wkhtmltopdf.exe'
+        #wkhtmltopdf = os.path.dirname(__file__).replace('\\', '/') + '/wkhtmltox/bin/wkhtmltopdf.exe'
     else:
         wkhtmltopdf = "wkhtmltopdf"
     p = subprocess.Popen([wkhtmltopdf, html_file, pdf_file])

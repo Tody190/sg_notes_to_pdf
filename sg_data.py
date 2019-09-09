@@ -32,7 +32,19 @@ class Playlist_Notes:
     def __init__(self, playlist_name: str):
         self.playlist_name = playlist_name
 
-    def get(self) -> "{version_name: [notes]}":
+    def download_attachments(self, entitys, download_path):
+        if not os.path.exists(download_path):
+            os.makedirs(download_path)
+
+        attachment_files = []
+        for entity in entitys:
+            attachment_file = os.path.join(download_path, entity["name"])
+            SG.download_attachment(entity, attachment_file)
+            print("Download: %s" % attachment_file)
+            attachment_files.append(attachment_file)
+        return attachment_files
+
+    def get(self, attachments_download_path=None) -> "{version_name: [notes]}":
         # 获取所有 version 实例
         version_entitys = self.get_playlist_versions(self.playlist_name)
         if not version_entitys:
@@ -47,7 +59,12 @@ class Playlist_Notes:
                 note = collections.OrderedDict()
                 note["subject"] = n["subject"]
                 note["content"] = n["content"]
-                note["attachments"] = n["attachments"]
+                if attachments_download_path:
+                    note["attachments"] = self.download_attachments(n["attachments"],
+                                                                    download_path=attachments_download_path)
+                else:
+                    note["attachments"] = []
+
                 notes[v["name"]].append(note)
         return notes
 
@@ -64,44 +81,15 @@ class Playlist_Notes:
             raise Exception("多于一个 Playlist 实体名字为：%s"%playlist_name)
 
     def get_version_notes(self, version_entity):
-        fields = ["id", "subject", "content", "user", "addressings_to", "attachments"]
+        fields = ["id",
+                  "subject",
+                  "content",
+                  "user",
+                  "addressings_to",
+                  "attachments"]
         filters = [["note_links", "in", version_entity]]
         note_entitys = SG.find("Note", filters, fields)
         return note_entitys
-
-
-def download_attachment(attachment_entity, download_path):
-    if not os.path.exists(download_path):
-        os.makedirs(download_path)
-
-    attachment_file = os.path.join(download_path, attachment_entity["name"])
-    SG.download_attachment(attachment_entity, attachment_file)
-    #print("Download: %s"%attachment_file)
-
-    if os.path.exists(attachment_file):
-        return attachment_file
-
-
-def get_notes_data(playlist, attachments_download_path=None):
-    pn = Playlist_Notes(playlist)
-    notes_data = pn.get()
-
-    for notes_list in notes_data.values():
-        for note in notes_list:
-            attachments = note["attachments"]
-            new_attachments = []
-            # 下载附件并将保存地址替换原值
-            for attachment in attachments:
-                if attachments_download_path:
-                    attachment_url = download_attachment(attachment, attachments_download_path)
-                else:
-                    attachment_url = SG.get_attachment_download_url(attachment)
-
-                if attachment_url:
-                    new_attachments.append(attachment_url)
-
-            note["attachments"] = new_attachments
-    return notes_data
 
 
 
